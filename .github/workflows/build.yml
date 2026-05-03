@@ -53,6 +53,9 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=sha
 
+      # Introducing multi-platform builds slows down the step a lot. 
+      # I added caching, but this comes with it's own downsides 
+      # such as missing a vulnerability update in a base image 
       - name: Build and push image
         uses: docker/build-push-action@v6
         with:
