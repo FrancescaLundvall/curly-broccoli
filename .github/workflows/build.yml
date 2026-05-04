@@ -65,3 +65,30 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  # Example usage of the notify-slack action
+  # This can be used in a separate deploy pipeline if desired
+  deploy: 
+    name: Deploy
+    needs:
+      - build
+    runs-on: ubuntu-24.04
+    steps:
+      - name: deploy-prod
+        run: exit 1
+ 
+  notify-slack-on-failure:
+    name: Notify Slack on failure
+    runs-on: ubuntu-24.04
+    needs: 
+      - build
+      - deploy
+    if: failure()
+    steps: 
+      - name: Send Slack notification
+        uses: slackapi/slack-github-action@91efab103c0de0a537f72a35f6b8cda0ee76bf0a # v2
+        with: 
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: webhook-trigger
+          payload: |
+            notification: "Deployment of MyApp failed. Please investigate: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
