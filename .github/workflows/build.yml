@@ -65,3 +65,30 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  # Example usage of the notify-slack action
+  # This can be used in a separate deploy pipeline if desired
+  deploy: 
+    name: Deploy
+    needs:
+      - build
+    runs-on: ubuntu-24.04
+    steps:
+      - name: deploy-prod
+        run: |
+          echo "Deploying to production..."
+  
+  notify-on-failure:
+    name: Notify Slack if any job fails
+    needs:
+      - build
+      - deploy
+    if: ${{ always() && contains(needs.*.results, 'failure') }}
+    runs-on: 
+      - ubuntu-24.04
+    steps:
+      - name: Notify on failure
+        uses: ./.github/actions/notify-slack
+        with: 
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          target_service: MyApp
