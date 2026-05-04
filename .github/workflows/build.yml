@@ -75,8 +75,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: deploy-prod
-        run: |
-          echo "Deploying to production..."
+        run: exit 1
   
   notify-on-failure:
     name: Notify Slack if any job fails
